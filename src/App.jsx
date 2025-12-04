@@ -1,17 +1,43 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
+import authService from "./appwrite/auth";
+import { logout } from "./store/authSlice";
+import { Footer, Header } from "./components";
+import { Outlet } from "react-router-dom";
 
 const App = () => {
-  const envVariable = import.meta.env.VITE_APPWRITE_ENDPOINT;
-  return (
+  const [loading, setLoading] = useState(true);
+  const dispach = useDispatch();
+
+  useEffect(() => {
+    authService
+      .getCurrentUser()
+      .then((userData) => {
+        if (userData) {
+          dispach(login(userData));
+        } else {
+          dispach(logout());
+        }
+      })
+      .finally(() => setLoading(false));
+  });
+  return !loading ? (
     <>
-      <div className="text-center text-4xl bg-gray-500 text-green-500 font-black py-4 ">
-        KG BLOGS - APPWRITE
-      </div>
-      <div className="text-center text-3xl text-blue-600 font-bold">
-        env: {envVariable}
+      <div className="min-h-screen flex flex-wrap items-item bg-gray-400">
+        <div className="w-full block">
+          <header>
+            <Header />
+          </header>
+          <main>
+            <Outlet />
+          </main>
+          <footer>
+            <Footer />
+          </footer>
+        </div>
       </div>
     </>
-  );
+  ) : null;
 };
 
 export default App;
