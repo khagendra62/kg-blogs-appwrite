@@ -1,6 +1,44 @@
+import { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
+import authService from "./appwrite/auth";
+import { login, logout } from "./store/authSlice";
+import { Header, Footer } from "./components";
+// import { Outlet } from "react-router-dom";
+
 const App = () => {
-  return (
-    <div className="text-4xl text-center p-4 font-black">KG-BLOGS-APPWRITE</div>
+  const [loading, setLoading] = useState(true);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    authService
+      .getCurrentUser()
+      .then((userData) => {
+        if (userData) {
+          dispatch(login({ userData }));
+        } else {
+          dispatch(logout());
+        }
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, []);
+
+  return !loading ? (
+    <div className="min-h-screen flex flex-wrap content-between b-gray-400">
+      <div className="w-full block">
+        <Header />
+        {/* <main>
+          <Outlet />
+        </main> */}
+        <Footer />
+      </div>
+    </div>
+  ) : (
+    <>
+      <div>Loading.........</div>
+      {console.log("loading plz wait")}{" "}
+    </>
   );
 };
 
