@@ -1,19 +1,24 @@
 import React, { useState, useEffect } from "react";
 import appwriteService from "../appwrite/config";
 import { Container, PostCard } from "../components";
-import { Link, useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { Link } from "react-router-dom";
 
 const HomePage = () => {
   const [posts, setPosts] = useState([]);
-  navigate = useNavigate();
 
   useEffect(() => {
-    appwriteService.getPosts().then((posts) => {
-      if (posts) {
-        setPosts(posts.documents);
+    const fetchPosts = async () => {
+      try {
+        const posts = await appwriteService.getPosts([]);
+        if (posts) {
+          setPosts(posts.documents);
+        }
+      } catch (error) {
+        console.log("Not logged in or unauthorized");
       }
-    });
+    };
+
+    fetchPosts();
   }, []);
 
   if (posts.length === 0) {

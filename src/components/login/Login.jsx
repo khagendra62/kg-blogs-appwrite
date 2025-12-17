@@ -9,6 +9,7 @@ import { useForm } from "react-hook-form";
 const Login = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const [loading, setLoading] = useState(true);
   const { register, handleSubmit } = useForm();
   const [error, setError] = useState("");
 
@@ -17,12 +18,16 @@ const Login = () => {
     try {
       const session = await authService.login(data);
       if (session) {
-        const userData = authService.getCurrentUser();
-        if (userData) dispatch(authLogin(userData));
+        const userData = await authService.getCurrentUser();
+        if (userData) {
+          dispatch(authLogin(userData));
+        }
         navigate("/");
       }
     } catch (error) {
       setError(error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -75,8 +80,8 @@ const Login = () => {
               })}
             />
 
-            <Button type="submit" className="w-full">
-              Sign-in
+            <Button type="submit" className="w-full" disabled={loading}>
+              {loading ? "Signing in..." : "Sign-in"}
             </Button>
           </div>
         </form>
